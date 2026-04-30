@@ -14,6 +14,14 @@ Implementace životního cyklu znalostního grafu nad technickou dokumentací s 
 
 ---
 
+## Požadavky
+
+- Python 3.11
+- [Ollama](https://ollama.com) — pro lokální běh jazykových modelů
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) 
+
+---
+
 ## Instalace
 
 ### 1. Klonování repozitáře
@@ -23,7 +31,7 @@ git clone https://github.com/ngum17/graphrag-lifecycle-local.git
 cd graphrag-lifecycle-local
 ```
 
-### 2. Instalace závislostí
+### 2. Instalace Python závislostí
 
 ```bash
 pip install -r requirements.txt
@@ -31,7 +39,7 @@ pip install -r requirements.txt
 
 ### 3. Konfigurace prostředí
 
-Zkopíruj šablonu a vyplň přihlašovací údaje k Neo4j:
+Zkopírovat šablonu a vyplnit přihlašovací údaje k Neo4j:
 
 ```bash
 cp .env.example .env
@@ -51,10 +59,19 @@ NEO4J_PASSWORD=your_password
 docker-compose up -d
 ```
 
-### 5. Spuštění Ollama modelu
+### 5. Stažení a spuštění jazykových modelů
+
+Před prvním spuštěním je nutné stáhnout modely přes Ollama:
 
 ```bash
 ollama pull llama3.1:8b
+
+ollama pull qwen2.5:7b
+```
+
+Spuštění Ollama serveru:
+
+```bash
 ollama serve
 ```
 
@@ -64,19 +81,21 @@ ollama serve
 
 ### Konverze PDF na Markdown
 
-Otevři a spusť `notebooks/md_converter.ipynb`.
+Pro konverzi PDF dokumentů spustit `notebooks/md_converter.ipynb`.  
 Výstupní `.md` soubory jsou uloženy ve složce `documents/md/`.
 
 ### Sestavení znalostního grafu a evaluace
 
-Otevři `notebooks/graphrag_pipeline_eval_SF.ipynb` nebo `graphrag_pipeline_eval_PA.ipynb`.
+Pro sestavení grafu a evaluaci spustit `notebooks/graphrag_pipeline_eval_*.ipynb`.
 
 Notebook obsahuje dvě části:
 
-1. **Pipeline** (buňky 1–12) — načtení dokumentu, build grafu, indexy, retrievery, RAG chain
-2. **Evaluace** (buňky 13+) — testovací sady, metriky (BERTScore, ROUGE-L, RAGAS)
+1. **Pipeline** — načtení dokumentu, build grafu, indexy, retrievery, RAG chain
+2. **Evaluace** — testovací sady, metriky (BERTScore, ROUGE-L, RAGAS)
 
 ### Streamlit aplikace
+
+Spuštění aplikace:
 
 ```bash
 streamlit run app/app.py
