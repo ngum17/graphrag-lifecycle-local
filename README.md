@@ -19,7 +19,7 @@ Implementace životního cyklu znalostního grafu nad technickou dokumentací s 
 ### 1. Klonování repozitáře
 
 ```bash
-git clone https://github.com/<tvuj-username>/graphrag-lifecycle-local.git
+git clone https://github.com/ngum17/graphrag-lifecycle-local.git
 cd graphrag-lifecycle-local
 ```
 
@@ -65,7 +65,7 @@ ollama serve
 ### Konverze PDF na Markdown
 
 Otevři a spusť `notebooks/md_converter.ipynb`.
-Výstupní `.md` soubory ulož do složky `documents/`.
+Výstupní `.md` soubory jsou uloženy ve složce `documents/md/`.
 
 ### Sestavení znalostního grafu a evaluace
 
@@ -96,18 +96,26 @@ Aplikace zpřístupňuje záložky:
 graphrag-lifecycle-local/
 ├── app/
 │   └── app.py                            # Streamlit aplikace
-├── notebooks/
-│   ├── md_converter.ipynb                # PDF -> Markdown konverze
-│   ├── graphrag_pipeline_eval_SF.ipynb   # Pipeline + evaluace (Strojirenska firma)
-│   └── graphrag_pipeline_eval_PA.ipynb   # Pipeline + evaluace (Planovani a analytika)
-├── documents/                            # Zdrojove Markdown dokumenty
+├── cache/                                # PKL cache (extrakce entit)
+│   ├── AF_II_05_05_Prediktivni_Analytika-2.pkl
+│   ├── AF_III_02_01__Strojirenska_Firma.pkl
+│   └── AF_III_02_01_06_Stroj_Planovani_PA.pkl
+├── docs/
+│   └── architecture.png                  # Diagram architektury
+├── documents/
+│   ├── md/                               # Zdrojové dokumenty (Markdown)
+│   └── pdf/                              # Zdrojové dokumenty (PDF)
 ├── evaluation/
 │   ├── evaluation_strojirenska_firma.csv
 │   └── evaluation_planovani_pa.csv
 ├── neo4j/                                # Docker konfigurace Neo4j
+├── notebooks/
+│   ├── md_converter.ipynb                # PDF -> Markdown konverze
+│   ├── graphrag_pipeline_eval_SF.ipynb   # Pipeline + evaluace (Strojirenska firma)
+│   └── graphrag_pipeline_eval_PA.ipynb   # Pipeline + evaluace (Planovani a analytika)
 ├── docker-compose.yaml
 ├── requirements.txt
-├── .env.example                          # Sablona konfigurace (bez hesel)
+├── .env.example                          # Šablona konfigurace (bez hesel)
 └── .gitignore
 ```
 
