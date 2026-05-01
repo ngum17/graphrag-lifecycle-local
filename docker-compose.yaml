@@ -1,6 +1,7 @@
 services:
   neo4j:
     build: ./neo4j
+    hostname: neo4j
     ports:
       - "7474:7474"
       - "7687:7687"
