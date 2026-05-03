@@ -127,6 +127,9 @@ graphrag-lifecycle-local/
 ├── evaluation/
 │   ├── evaluation_strojirenska_firma.csv
 │   └── evaluation_planovani_pa.csv
+├── graphs/                               # Exporty znalostních grafů
+│   ├── AF_III_02_01__Strojirenska_Firma.graphml   
+│   └── AF_III_02_01_06_Stroj_Planovani_PA.graphml 
 ├── neo4j/                                # Docker konfigurace Neo4j
 ├── notebooks/
 │   ├── md_converter.ipynb                # PDF -> Markdown konverze
@@ -167,3 +170,11 @@ Výsledky evaluace jsou dostupné ve složce `evaluation/`.
 | Reranking             | CrossEncoder (sentence-transformers) |
 | UI                    | Streamlit                            |
 | PDF konverze          | Docling                              |
+
+---
+
+## Exporty znalostního grafu
+
+Exporty znalostních grafů ve formátu GraphML pro oba evaluované dokumenty 
+jsou dostupné ve složce `graphs/`. Soubory lze otevřít například v nástroji 
+[Gephi](https://gephi.org/) nebo [yEd live](https://www.yworks.com/yed-live/) pro interaktivní vizualizaci a průzkum struktury grafu.
