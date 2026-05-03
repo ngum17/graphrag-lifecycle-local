@@ -247,7 +247,7 @@ with st.sidebar:
     )
     
     st.divider()
-    st.markdown("<p class='badge badge-info'>⚙️ PERFORMANCE</p>", unsafe_allow_html=True)
+    st.markdown("<p class='badge badge-info'>PERFORMANCE</p>", unsafe_allow_html=True)
     
     # ── RAM check ─────────────────────────────────────────────────────────────
     available_ram_gb = None
@@ -268,7 +268,7 @@ with st.sidebar:
         
         st.markdown(
             f'<div class="card">'
-            f'<span class="badge {ram_badge}">💾 {ram_color} RAM: {available_ram_gb:.1f}GB / {total_ram_gb:.1f}GB</span>'
+            f'<span class="badge {ram_badge}">{ram_color} RAM: {available_ram_gb:.1f}GB / {total_ram_gb:.1f}GB</span>'
             f'</div>',
             unsafe_allow_html=True
         )
@@ -287,7 +287,6 @@ with st.sidebar:
     st.caption("1 worker — sekvenční zpracování | 2+ workers — 2–3× rychlejší, vyšší nároky na RAM")
 
     st.divider()
-    st.markdown("<p class='badge badge-warn'>⚠️ DANGER ZONE</p>", unsafe_allow_html=True)
     if st.button("🧹 Vymazat Neo4j DB", use_container_width=True, key="clear_db"):
         try:
             from neo4j import GraphDatabase
@@ -376,7 +375,7 @@ with tab_pdf:
                 st.error("❌  `docling` není nainstalováno. Spusť: `pip install docling`")
                 st.stop()
 
-            logger_pdf.log(f"🚀 Zahajuji konverzi: {uploaded_pdf.name}")
+            logger_pdf.log(f"Zahajuji konverzi: {uploaded_pdf.name}")
 
             with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
                 tmp.write(uploaded_pdf.read())
@@ -403,7 +402,7 @@ with tab_pdf:
                     os.unlink(tmp_path)
 
             # ── Reading order export ──────────────────────────────────────────
-            logger_pdf.log("📐 Sestavuji markdown ve fyzickém pořadí čtení…")
+            logger_pdf.log("Sestavuji markdown ve fyzickém pořadí čtení…")
 
             SKIP_LABELS = {'page_header', 'page_footer', 'page_number', 'footnote'}
 
@@ -513,9 +512,9 @@ with tab_pdf:
                 return preamble + ''.join(c for _, c in chunks)
 
             md_output = export_with_reading_order(result.document)
-            logger_pdf.log("🔧 Opravuji úrovně hlaviček…")
+            logger_pdf.log("Opravuji úrovně hlaviček…")
             md_output = fix_headers(md_output)
-            logger_pdf.log("🔀 Seřazuji případné přeskočené kapitoly…")
+            logger_pdf.log("Seřazuji případné přeskočené kapitoly…")
             md_output = reorder_sections(md_output)
 
             lines_count = len(md_output.splitlines())
@@ -699,7 +698,7 @@ with tab_graph:
                 st.stop()
 
             # ── 1. SPLIT ─────────────────────────────────────────────────────
-            logger_g.log("📐 Dělím Markdown na chunky…")
+            logger_g.log("Dělím Markdown na chunky…")
             headers_to_split_on = [
                 ("#", "Header 1"), ("##", "Header 2"), ("###", "Header 3"),
                 ("####", "Header 4"), ("#####", "Header 5"), ("######", "Header 6"),
@@ -716,10 +715,10 @@ with tab_graph:
                     continue
                 documents.append(doc)
 
-            logger_g.log(f"📊 Chunků celkem: {len(all_documents)} → po filtraci: {len(documents)}")
+            logger_g.log(f"Chunků celkem: {len(all_documents)} → po filtraci: {len(documents)}")
 
             # ── 2. HASH + NEO4J SYNC ─────────────────────────────────────────
-            logger_g.log("🔑 Počítám hashe chunků…")
+            logger_g.log("Počítám hashe chunků…")
             def get_chunk_hash(text):
                 return hashlib.md5(text.encode('utf-8')).hexdigest()
 
@@ -779,11 +778,11 @@ with tab_graph:
             if not cache_file and md_filename:
                 # Prázdný sidebar + máme MD jméno → auto-generate
                 _cache_file = Path(md_filename).stem + ".pkl"
-                logger_g.log(f"📁 Auto-generated PKL: {_cache_file}")
+                logger_g.log(f"Auto-generated PKL: {_cache_file}")
             elif cache_file:
                 # Uživatel zadal jméno → použij to
                 _cache_file = cache_file
-                logger_g.log(f"📁 PKL z sidebaru: {_cache_file}")
+                logger_g.log(f"PKL z sidebaru: {_cache_file}")
             else:
                 # Fallback - nejde generovat
                 _cache_file = "default.pkl"
@@ -805,15 +804,15 @@ with tab_graph:
             missing_in_neo4j = [doc for doc in documents if doc.metadata.get("hash") not in neo4j_hashes]
             docs_for_llm     = [doc for doc in missing_in_neo4j if doc.metadata.get("hash") not in local_cache]
 
-            logger_g.log(f"📊 Celkem chunků v textu: {len(documents)}")
-            logger_g.log(f"🗄️ Z toho už je v Neo4j: {len(neo4j_hashes)}")
-            logger_g.log(f"📁 Z toho už máme předpočítáno v PKL: {len(local_cache)}")
-            logger_g.log(f"🔥 Bude se přes LLM reálně počítat: {len(docs_for_llm)} chunků")
+            logger_g.log(f"Celkem chunků v textu: {len(documents)}")
+            logger_g.log(f"Z toho už je v Neo4j: {len(neo4j_hashes)}")
+            logger_g.log(f"Z toho už předpočítáno v PKL: {len(local_cache)}")
+            logger_g.log(f"Bude se přes LLM reálně počítat: {len(docs_for_llm)} chunků")
 
             # ── 4. LLM extraction — PARALELNÍ S FALLBACK NA SEKVENČNÍ ────────────
             # PKL se ukládá PO KAŽDÉM chunku → při pádu/restartu pokračuje tam kde skončilo
             if docs_for_llm:
-                logger_g.log(f"⏳ Spouštím LLM extrakci pro {len(docs_for_llm)} chunků…")
+                logger_g.log(f"Spouštím LLM extrakci pro {len(docs_for_llm)} chunků…")
                 try:
                     from concurrent.futures import ThreadPoolExecutor, as_completed
                     import psutil
@@ -830,15 +829,15 @@ with tab_graph:
                     # Pokud je nastavený slider na >1, použij to; jinak auto-detect
                     if st.session_state.get("max_workers_slider", 1) > 1:
                         max_workers = st.session_state.get("max_workers_slider", 1)
-                        logger_g.log(f"💾 RAM dostupné: {available_ram_gb:.1f}GB → override z slideru: {max_workers} workers")
+                        logger_g.log(f"RAM dostupné: {available_ram_gb:.1f}GB → override z slideru: {max_workers} workers")
                     else:
                         # Auto-detect (konzervativní: 10GB threshold místo 12GB)
                         if available_ram_gb > 10:
                             max_workers = 2
-                            logger_g.log(f"💾 RAM dostupné: {available_ram_gb:.1f}GB → auto-detect: 2 workers")
+                            logger_g.log(f"RAM dostupné: {available_ram_gb:.1f}GB → auto-detect: 2 workers")
                         else:
                             max_workers = 1
-                            logger_g.log(f"💾 RAM dostupné: {available_ram_gb:.1f}GB → auto-detect: 1 worker (sekvenčně)")
+                            logger_g.log(f"RAM dostupné: {available_ram_gb:.1f}GB → auto-detect: 1 worker (sekvenčně)")
 
                     # ── Worker function pro jeden chunk ────────────────────────────────────
                     def process_chunk(doc_idx_tuple):
@@ -932,7 +931,7 @@ with tab_graph:
             # ── 5. Upload to Neo4j ────────────────────────────────────────────
             new_graph_docs = [local_cache[doc.metadata["hash"]] for doc in missing_in_neo4j if doc.metadata.get("hash") in local_cache]
             if new_graph_docs:
-                logger_g.log(f"⏳ Nahrávám {len(new_graph_docs)} dokumentů do Neo4j…")
+                logger_g.log(f"Nahrávání {len(new_graph_docs)} dokumentů do Neo4j…")
                 try:
                     graph = Neo4jGraph(url=neo4j_uri, username=neo4j_user, password=neo4j_pass)
                     graph.add_graph_documents(new_graph_docs, baseEntityLabel=True, include_source=True)
@@ -1140,7 +1139,7 @@ with tab_query:
                 ranked = sorted(zip(scores, docs), key=lambda x: x[0], reverse=True)
                 
                 # Debug logging (identické jako v notebooku)
-                logger_q.log(f"  📊 Reranking ({len(docs)} docs → top {top_k}):")
+                logger_q.log(f"  Reranking ({len(docs)} docs → top {top_k}):")
                 for rank_i, (score, doc) in enumerate(ranked, 1):
                     text = doc.page_content if hasattr(doc, "page_content") else doc
                     preview = text[:120].replace("\n", " ")
@@ -1152,7 +1151,7 @@ with tab_query:
             # ── Vector index ─────────────────────────────────────────────────
             vector_retriever = None
             try:
-                logger_q.log("🔍 Inicializuji vektorový index…")
+                logger_q.log("Inicializuji vektorový index…")
                 neo4j_dense_index = Neo4jVector.from_existing_index(
                     embeddings,
                     index_name="vector",
@@ -1178,7 +1177,7 @@ with tab_query:
                 logger_q.log(f"⚠️ Neo4jVector selhání: {str(e)[:300]}")
                 # Ultra fallback: manual vector search via Cypher
                 # This is slower but works if index is completely broken
-                logger_q.log("🔧 Používám manuální vektorové vyhledávání (fallback)…")
+                logger_q.log("Používám manuální vektorové vyhledávání (fallback)…")
                 
                 class ManualVectorRetriever:
                     def __init__(self, embeddings, driver, k=20):
@@ -1223,11 +1222,11 @@ with tab_query:
                     with driver_dbg.session() as sess_dbg:
                         idx_result = sess_dbg.run("SHOW INDEXES")
                         idx_list = list(idx_result)
-                        logger_q.log(f"  📊 Indexy v Neo4j: {[r.get('name') for r in idx_list]}")
+                        logger_q.log(f"  Indexy v Neo4j: {[r.get('name') for r in idx_list]}")
                         
                         doc_result = sess_dbg.run("MATCH (d:Document) RETURN count(*) as cnt, sum(CASE WHEN d.embedding IS NOT NULL THEN 1 ELSE 0 END) as with_emb")
                         for rec in doc_result:
-                            logger_q.log(f"  📄 Dokumentů: {rec['cnt']}, s embeddingy: {rec['with_emb']}")
+                            logger_q.log(f"  Dokumentů: {rec['cnt']}, s embeddingy: {rec['with_emb']}")
                     driver_dbg.close()
                 except Exception as dbg_e:
                     logger_q.log(f"  ❌ Debug check selhal: {dbg_e}")
@@ -1266,7 +1265,7 @@ Entity: ["výhody agilního řízení projektů"]
             def graph_enhanced_retriever(q):
                 try:
                     entities = entity_chain.invoke({"question": q})
-                    logger_q.log(f"🔍 Entity: {entities.names}")
+                    logger_q.log(f"Entity: {entities.names}")
                     all_documents = []
                     seen_docs = set()
                     relations_text = ""
@@ -1323,7 +1322,7 @@ Entity: ["výhody agilního řízení projektů"]
                             podrizena_entita = r.get('podrizena_entita')
                             
                             if node_name not in printed_nodes:
-                                logger_q.log(f"  🎯 Nalezen uzel [{node_type}]: '{node_name}'")
+                                logger_q.log(f"  Nalezen uzel [{node_type}]: '{node_name}'")
                                 printed_nodes.add(node_name)
                             
                             if rel and neighbor:
@@ -1354,12 +1353,12 @@ Entity: ["výhody agilního řízení projektů"]
 
             with st.spinner("Vyhledávám a generuji odpověď…"):
                 if mode == "1":
-                    logger_q.log("📚 Naive RAG — vektorové vyhledávání…")
+                    logger_q.log("Naive RAG — vektorové vyhledávání…")
                     docs = dense_retriever.invoke(question) if dense_retriever else []
                     context = "\n\n".join(d.page_content for d in docs[:25])
 
                 elif mode == "2":
-                    logger_q.log("🕸️ Graph RAG…")
+                    logger_q.log("Graph RAG…")
                     relations_text, graph_docs = graph_enhanced_retriever(question)
                     ranked = rerank_docs(question, graph_docs, top_k=10)
                     graph_text = "\n\n".join(d if isinstance(d, str) else d.page_content for d in ranked)
@@ -1372,7 +1371,7 @@ Entity: ["výhody agilního řízení projektů"]
                     logger_q.log("🔀 Hybrid GraphRAG…")
                     
                     # Vector retrieval
-                    logger_q.log(f"📚 Vektorové vyhledávání — dotaz: '{question[:80]}...'")
+                    logger_q.log(f"Vektorové vyhledávání — dotaz: '{question[:80]}...'")
                     try:
                         if vector_retriever:
                             vector_docs = hybrid_retriever.invoke(question)
@@ -1387,8 +1386,8 @@ Entity: ["výhody agilního řízení projektů"]
                     # Graph retrieval
                     graph_rel, graph_docs = graph_enhanced_retriever(question)
                     
-                    logger_q.log(f"📚 Vektorové: {len(vector_docs)} dokumentů → reranking na 8…")
-                    logger_q.log(f"🕸️ Grafové: {len(graph_docs)} dokumentů → reranking na 8…")
+                    logger_q.log(f"Vektorové: {len(vector_docs)} dokumentů → reranking na 10…")
+                    logger_q.log(f"Grafové: {len(graph_docs)} dokumentů → reranking na 10…")
                     
                     reranked_v = rerank_docs(question, vector_docs, top_k=10)
                     reranked_g = rerank_docs(question, graph_docs, top_k=10) if graph_docs else []
@@ -1405,7 +1404,7 @@ Entity: ["výhody agilního řízení projektů"]
                                f"\n\n### 2. VEKTOROVÉ DOKUMENTY (Doplňující textový kontext):\n{vector_text_trimmed}"
                                f"\n\n### 3. VZTAHY Z GRAFU (Strukturální kontext):\n{graph_rel_trimmed}")
                     
-                    logger_q.log(f"📏 Context velikost: {len(context)} chars (graf_rel: {len(graph_rel)}, vektor: {len(vector_text)}, graf: {len(graph_text)})")
+                    logger_q.log(f"Context velikost: {len(context)} chars (graf_rel: {len(graph_rel)}, vektor: {len(vector_text)}, graf: {len(graph_text)})")
 
                 # ── LLM answer ────────────────────────────────────────────────
                 template = """
@@ -1465,7 +1464,7 @@ with tab_viz:
         )
     with col_lim:
         st.markdown("")
-        run_viz = st.button("📊  Vizualizovat", use_container_width=True, key="run_viz")
+        run_viz = st.button("Vizualizovat", use_container_width=True, key="run_viz")
 
     log_ph_v = st.empty()
     logger_v  = StreamlitLogger(log_ph_v)
@@ -1475,7 +1474,7 @@ with tab_viz:
         try:
             from neo4j import GraphDatabase as _GD
             driver = _GD.driver(neo4j_uri, auth=(neo4j_user, neo4j_pass))
-            logger_v.log("🔌 Připojeno k Neo4j.")
+            logger_v.log("Připojeno k Neo4j.")
 
             with driver.session() as session:
                 result_viz = session.run(cypher_query)
@@ -1519,7 +1518,7 @@ with tab_viz:
                         })
 
             nodes_list = list(nodes_dict.values())
-            logger_v.log(f"📊 Uzlů: {len(nodes_list)}, hran: {len(edges_list)}")
+            logger_v.log(f"Uzlů: {len(nodes_list)}, hran: {len(edges_list)}")
 
             # ── yFiles Streamlit component (if available) ───────────────────
             yfiles_available = False
@@ -1658,7 +1657,7 @@ with tab_viz:
                 st.plotly_chart(fig, use_container_width=True)
 
             # ── Data table ───────────────────────────────────────────────────
-            with st.expander(f"📋 Tabulka uzlů ({len(nodes_list)})"):
+            with st.expander(f"Tabulka uzlů ({len(nodes_list)})"):
                 import pandas as pd
                 df_nodes = pd.DataFrame([{"ID": n["id"], "Label": n["label"], "Typ": n["type"]} for n in nodes_list])
                 st.dataframe(df_nodes, use_container_width=True, height=300)
